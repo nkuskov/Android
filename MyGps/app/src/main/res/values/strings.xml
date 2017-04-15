@@ -3,4 +3,6 @@
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Network</string>
     <string name="location_settings">Location settings</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="map_window">Show on Map</string>
 </resources>

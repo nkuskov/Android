@@ -51,13 +51,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"/>
-    <Button
-        android:id="@+id/btnLocationSettings"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:onClick="onClickLocationSettings"
-        android:text="@string/location_settings"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btnLocationSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClickLocationSettings"
+            android:text="@string/location_settings"/>
+
+        <Button
+            android:id="@+id/btnOpenMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClickToMap"
+            android:text="@string/map_window"/>
+
+    </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/locationLatitude"

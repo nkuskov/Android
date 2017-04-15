@@ -167,6 +167,14 @@ public class MainActivity extends Activity implements LocationListener {
     }
 
     /**
+     * Method for window switch
+     */
+    public void onClickToMap(View view){
+        startActivity(new Intent(MainActivity.this, MapsActivity.class));
+    }
+
+
+    /**
      * Method for getting your address from your coordinates
      */
     private void getAddress(Location location){
