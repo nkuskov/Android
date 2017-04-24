@@ -19,6 +19,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
 import android.content.DialogInterface.OnClickListener;
+import android.widget.TextView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -35,6 +37,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,6 +50,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker mMarker;
     Geocoder mGeocoder;
     List<Address> mAddressList = null;
+    TextView currentLocation;
+    TextView currentSpeed;
+    double speed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +63,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mGeocoder = new Geocoder(this, Locale.getDefault());
+        currentLocation = (TextView) findViewById(R.id.current_location);
+        currentSpeed = (TextView) findViewById(R.id.current_speed);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            } else {
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MapsActivity.this);
+            }
+
+        }
     }
 
     @Override
@@ -81,7 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // Add a marker in Sydney and move the camera
             buildGoogleApiClient();
@@ -89,9 +111,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             checkLocationPermission();
         }
-
-
-
 
 
     }
@@ -109,7 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location) {
         mLastLocation = location;
 
-        if(mMarker != null){
+        if (mMarker != null) {
             mMarker.remove();
         }
 
@@ -120,15 +139,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        currentLocation.setText("Location: " + mAddressList.get(0).getAddressLine(0));
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title(mAddressList.get(0).getAddressLine(0));
         mMarker = mMap.addMarker(markerOptions);
+        speed = location.getSpeed() * 18/5;
+        currentSpeed.setText("Speed: " + new DecimalFormat("#.##").format(speed) + " km/h");
 
     }
-
 
 
     @Override
@@ -141,8 +160,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
+            LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         }
 
     }
@@ -158,10 +177,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public static final int MY_PERMISSION_REQUEST_LOCATION = 99;
-    private void checkLocationPermission(){
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
                 new AlertDialog.Builder(this)
                         .setTitle("Location Permission Needed")
@@ -186,12 +206,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case MY_PERMISSION_REQUEST_LOCATION: {
-                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    if(ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                        if(mGoogleApiClient == null){
+                    if (ContextCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        if (mGoogleApiClient == null) {
                             buildGoogleApiClient();
                         }
                         mMap.setMyLocationEnabled(true);
