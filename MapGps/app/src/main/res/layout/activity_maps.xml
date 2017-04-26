@@ -14,13 +14,28 @@
         android:layout_marginTop="10dp"
         android:textSize="27sp"/>
 
-    <TextView
-        android:id="@+id/current_speed"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textSize="27sp"
-        />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/current_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="27sp"
+            />
+
+        <Button
+            android:id="@+id/draw_path_button"
+            android:text="Draw Path"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="chooseLocationButton"/>
+
+    </LinearLayout>
+
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:map="http://schemas.android.com/apk/res-auto"
