@@ -38,8 +38,9 @@ public class MainActivity extends Activity implements LocationListener {
 
     Geocoder geocoder;
 
+    CurrentLocation currentLocation;
 
-    LocationManager locationManager;
+    //LocationManager locationManager;
     StringBuilder sbGPS = new StringBuilder();
     StringBuilder sbNet = new StringBuilder();
 
@@ -58,7 +59,8 @@ public class MainActivity extends Activity implements LocationListener {
 
         geocoder = new Geocoder(this, Locale.getDefault());
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        currentLocation = new CurrentLocation(this,this);
+
 
 
         if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -68,7 +70,7 @@ public class MainActivity extends Activity implements LocationListener {
             return;
         }
 
-        checkLocation();
+        currentLocation.getCurrentLocation();
     }
 
 
@@ -89,8 +91,8 @@ public class MainActivity extends Activity implements LocationListener {
 
     @Override
     public void onProviderEnabled(String provider) {
-        checkEnabled();
-        showLocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+        currentLocation.getCurrentLocation();
+        showLocation(currentLocation.getLastLocation());
         Toast.makeText(getBaseContext(), "GPS is turned on",Toast.LENGTH_SHORT).show();
 
     }
@@ -107,7 +109,7 @@ public class MainActivity extends Activity implements LocationListener {
         switch (requestCode) {
             case 1: {
                 if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkLocation();
+                    currentLocation.getCurrentLocation();
                 }
                 return;
             }
@@ -115,12 +117,7 @@ public class MainActivity extends Activity implements LocationListener {
     }
 
 
-    private void checkLocation() {
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000 * 10, 10, this);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000 * 10, 10, this);
-    }
-
-    /**
+     /**
      * Method for formatting location into readable view
      *
      * @param location
@@ -150,13 +147,7 @@ public class MainActivity extends Activity implements LocationListener {
         }
     }
 
-    /**
-     * Method For checking Enabled or Disabled GPS and NETWORK Providers
-     */
-    private void checkEnabled() {
-        tvEnabledGPS.setText("Enabled: " + locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
-        tvEnabledNet.setText("Enabled: " + locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
-    }
+
 
     /**
      * Method for Location Settings Button

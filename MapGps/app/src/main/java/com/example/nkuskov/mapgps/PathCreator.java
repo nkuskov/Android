@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Class for creating Path between two points on Google Map. By parsing JSON file with polylines.
@@ -31,7 +32,7 @@ import java.util.List;
 public class PathCreator {
 
     Marker mMarker = null;
-    Polyline line = null;
+    Polyline line;
     MapsActivity mMapsActivity;
     static String json = "";
 
@@ -42,10 +43,11 @@ public class PathCreator {
     /**
      * Creating URL for requesting JSON file.
      * And call AsyncTask class for creating path.
+     *
      * @param sourcelat Latitude of source location
      * @param sourcelog Longitude of source location
-     * @param destlat Latitude of destination
-     * @param destlog Longitude of destination
+     * @param destlat   Latitude of destination
+     * @param destlog   Longitude of destination
      * @return
      */
     public void makeURL(double sourcelat, double sourcelog, double destlat, double destlog) {
@@ -70,30 +72,34 @@ public class PathCreator {
     /**
      * Drawing path by using List<LatLng>. This List was getting from Parsing JSON file
      * and taking from coding polylines.
+     *
      * @param path
      */
     public void drawPath(String path) {
-        if (line != null){
+        if (line != null) {
             line.remove();
         }
-        if (mMarker != null){
+        if (mMarker != null) {
             mMarker.remove();
         }
 
         try {
             final JSONObject jsonObject = new JSONObject(path);
             JSONArray routeArray = jsonObject.getJSONArray("routes");
+
             JSONObject routes = routeArray.getJSONObject(0);
             JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
             String encodedString = overviewPolylines.getString("points");
             List<LatLng> list = decodePoly(encodedString);
+            Random rand = new Random();
             line = mMapsActivity.mMap.addPolyline(new PolylineOptions()
                     .addAll(list)
                     .width(12)
-                    .color(Color.parseColor("#05b1fb"))
+                    .color(Color.rgb(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255)))
                     .geodesic(true));
 
-            mMarker = mMapsActivity.mMap.addMarker(new MarkerOptions().position(list.get(list.size()-1)));
+            mMarker = mMapsActivity.mMap.addMarker(new MarkerOptions().position(list.get(list.size() - 1)));
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -102,13 +108,14 @@ public class PathCreator {
 
     /**
      * Decoding Polylines from JSON file. To List<LatLng>
+     *
      * @param encoded
      * @return
      */
     private List<LatLng> decodePoly(String encoded) {
 
         List<LatLng> poly = new ArrayList<>();
-        LatLng latLng = new LatLng(mMapsActivity.mLastLocation.getLatitude(),mMapsActivity.mLastLocation.getLongitude());
+        LatLng latLng = new LatLng(mMapsActivity.mLastLocation.getLatitude(), mMapsActivity.mLastLocation.getLongitude());
         poly.add(latLng);
         int index = 0;
         int len = encoded.length();
@@ -147,6 +154,7 @@ public class PathCreator {
 
     /**
      * Getting JSON file from URL request.
+     *
      * @param urls
      * @return
      */

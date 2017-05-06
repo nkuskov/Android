@@ -8,10 +8,12 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 
+
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.LocationListener;
 
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceDetectionApi;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -43,6 +46,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
@@ -55,10 +60,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     List<Address> mAddressList = null;
     TextView currentLocation;
     TextView currentSpeed;
+    TextView currentTime;
     double speed;
     Place place;
     Intent intent;
     PathCreator mPathCreator;
+    PathStopWatch pathStopWatch = null;
 
     final static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     public static final int MY_PERMISSION_REQUEST_LOCATION = 99;
@@ -74,7 +81,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mGeocoder = new Geocoder(this, Locale.getDefault());
         currentLocation = (TextView) findViewById(R.id.current_location);
         currentSpeed = (TextView) findViewById(R.id.current_speed);
+        currentTime = (TextView) findViewById(R.id.current_time);
         mPathCreator = new PathCreator(this);
+
 
     }
 
@@ -243,14 +252,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(pathStopWatch!=null){
+            pathStopWatch.cancel(true);
+        }
         Toast.makeText(getApplicationContext(), "Activity Result", Toast.LENGTH_SHORT).show();
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 place = PlaceAutocomplete.getPlace(this, data);
                 mPathCreator.makeURL(mLastLocation.getLatitude(), mLastLocation.getLongitude(), place.getLatLng().latitude, place.getLatLng().longitude);
+                pathStopWatch = new PathStopWatch(mLastLocation, place, this);
+                pathStopWatch.execute();
             } else if (requestCode == RESULT_CANCELED) {
             }
         }
     }
+
+
+
 }
 
