@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +30,7 @@ import java.util.Random;
  * Created by nkuskov on 4/27/2017.
  */
 
-public class PathCreator {
+public class PathCreator implements Serializable {
 
     Marker mMarker = null;
     Polyline line;
