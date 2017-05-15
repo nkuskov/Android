@@ -73,8 +73,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Intent intent;
     PathCreator mPathCreator;
     PathStopWatch pathStopWatch = null;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
 
     final static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     public static final int MY_PERMISSION_REQUEST = 99;
@@ -94,19 +92,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mPathCreator = new PathCreator(this);
 
         Thread.setDefaultUncaughtExceptionHandler(new CustomizedExceptionHandler("/mnt/sdcard/"));
-
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-
-                } else {
-
-                }
-            }
-        };
     }
 
     @Override

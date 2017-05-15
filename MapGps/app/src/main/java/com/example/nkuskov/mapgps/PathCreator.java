@@ -52,6 +52,7 @@ public class PathCreator implements Serializable {
      * @return
      */
     public void makeURL(double sourcelat, double sourcelog, double destlat, double destlog) {
+
         //Making URL request for getting JSON file.
         StringBuilder urlString = new StringBuilder();
         urlString.append("https://maps.googleapis.com/maps/api/directions/json");
@@ -64,7 +65,8 @@ public class PathCreator implements Serializable {
         urlString.append(",");
         urlString.append(Double.toString(destlog));
         urlString.append("&sensor=false&mode=driving&alternatives=true");
-        urlString.append("&key=AIzaSyAvKrvyhgnE0D2Ljn-RfoM7lHB_Eld8xKE");
+        urlString.append(R.string.google_maps_key);
+
         //Call AsyncTask class for creating path
         connectAsyncTask asyncTask = new connectAsyncTask(urlString.toString());
         asyncTask.execute();
